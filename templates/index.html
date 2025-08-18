@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>s-or</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* ベースの背景色 */
+        body {
+            background-color: #fafafa; /* 明るいグレー */
+            color: #333333; /* ダークグレー */
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* コンテナを中央寄せ */
+        .container {
+            background-color: #ffffff; /* 白背景 */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2, h3, h4, h5 {
+            color: #444444; /* 少し暗めのグレー */
+        }
+
+        h3 {
+            border-bottom: 2px solid #a1c4fd; /* 優しいブルー */
+            padding-bottom: 5px;
+        }
+
+        /* フォームのラベルと入力フィールド */
+        .form-label {
+            color: #555555; /* ダークグレー */
+            font-weight: bold;
+        }
+
+        .form-control {
+            background-color: #f8f9fa; /* 明るいグレー */
+            border: 1px solid #ced4da;
+            color: #333333;
+            font-weight: 500;
+        }
+
+        .form-control:focus {
+            background-color: #f8f9fa;
+            border-color: #80bdff;
+            color: #333333;
+        }
+
+        .btn-primary {
+            background-color: #6c757d; /* グレー系のボタン */
+            border-color: #6c757d;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a6268; /* ダークグレー */
+            border-color: #545b62;
+        }
+
+        /* 結果ボックス */
+        .result-box {
+            background-color: #f1f1f1; /* 明るいグレー */
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .table {
+            color: #333333; /* ダークグレー */
+        }
+
+        .table th, .table td {
+            background-color: #f8f9fa; /* 明るいグレー */
+            border: 1px solid #ddd;
+        }
+
+        .table th {
+            background-color: #e9ecef; /* 薄いグレー */
+        }
+
+        .table-info {
+            background-color: #cce5ff; /* 明るいブルー */
+            font-weight: bold;
+        }
+
+        .table-success {
+            background-color: #d4edda; /* 薄いグリーン */
+            font-weight: bold;
+        }
+
+        .table-danger {
+            background-color: #f8d7da; /* 薄いピンク */
+            font-weight: bold;
+        }
+
+        /* 行間やセパレータを強調 */
+        .table-title {
+            font-weight: bold;
+            color: #495057; /* ダークグレー */
+        }
+
+        /* レスポンシブデザイン */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>財務諸表の各項目を入力してください。（損益計算書と貸借対照表のみ）</h2>
+        <form method="POST">
+            <h4>損益計算書</h4>
+            <h5>収益</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="sales" class="form-label">売上高</label>
+                    <input type="number" step="0.01" class="form-control" id="sales" name="sales" value="0" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="other_revenue" class="form-label">その他収益</label>
+                    <input type="number" step="0.01" class="form-control" id="other_revenue" name="other_revenue" value="0" required>
+                </div>
+            </div>
+            <h5>費用</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="cost_of_sales" class="form-label">売上原価</label>
+                    <input type="number" step="0.01" class="form-control" id="cost_of_sales" name="cost_of_sales" value="0" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="selling_expenses" class="form-label">販売費</label>
+                    <input type="number" step="0.01" class="form-control" id="selling_expenses" name="selling_expenses" value="0" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="admin_expenses" class="form-label">一般管理費</label>
+                    <input type="number" step="0.01" class="form-control" id="admin_expenses" name="admin_expenses" value="0" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="interest_expense" class="form-label">支払利息</label>
+                    <input type="number" step="0.01" class="form-control" id="interest_expense" name="interest_expense" value="0" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="tax_expense" class="form-label">税金</label>
+                    <input type="number" step="0.01" class="form-control" id="tax_expense" name="tax_expense" value="0" required>
+                </div>
+            </div>
+
+            <h4>貸借対照表</h4>
+            <h5>流動資産</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="cash" class="form-label">現金</label>
+                    <input type="number" step="0.01" class="form-control" id="cash" name="cash" value="0" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="accounts_receivable" class="form-label">売掛金</label>
+                    <input type="number" step="0.01" class="form-control" id="accounts_receivable" name="accounts_receivable" value="0" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="inventory" class="form-label">在庫</label>
+                    <input type="number" step="0.01" class="form-control" id="inventory" name="inventory" value="0" required>
+                </div>
+            </div>
+            <h5>固定資産</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="property" class="form-label">不動産</label>
+                    <input type="number" step="0.01" class="form-control" id="property" name="property" value="0" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="equipment" class="form-label">設備</label>
+                    <input type="number" step="0.01" class="form-control" id="equipment" name="equipment" value="0" required>
+                </div>
+            </div>
+            <h5>流動負債</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="short_term_loan" class="form-label">短期借入金</label>
+                    <input type="number" step="0.01" class="form-control" id="short_term_loan" name="short_term_loan" value="0" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="accounts_payable" class="form-label">買掛金</label>
+                    <input type="number" step="0.01" class="form-control" id="accounts_payable" name="accounts_payable" value="0" required>
+                </div>
+            </div>
+            <h5>長期負債</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="long_term_loan" class="form-label">長期借入金</label>
+                    <input type="number" step="0.01" class="form-control" id="long_term_loan" name="long_term_loan" value="0" required>
+                </div>
+            </div>
+            <h5>資本</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="equity" class="form-label">資本</label>
+                    <input type="number" step="0.01" class="form-control" id="equity" name="equity" value="0" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">計算する</button>
+        </form>
+
+        {% if profit_or_loss is not none %}
+        <div class="result-box">
+            <h3>損益計算書</h3>
+            <p>売上高: ¥{{ sales }}</p>
+            <p>その他収益: ¥{{ other_revenue }}</p>
+            <p>売上原価: ¥{{ cost_of_sales }}</p>
+            <p>販売費: ¥{{ selling_expenses }}</p>
+            <p>一般管理費: ¥{{ admin_expenses }}</p>
+            <p>支払利息: ¥{{ interest_expense }}</p>
+            <p>税金: ¥{{ tax_expense }}</p>
+            <p><strong>損益: ¥{{ profit_or_loss }}</strong></p>
+
+            <h3 class="mt-5">貸借対照表</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="table-title">項目</th>
+                        <th class="table-title">金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>現金</td>
+                        <td>¥{{ asset['現金'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>売掛金</td>
+                        <td>¥{{ asset['売掛金'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>在庫</td>
+                        <td>¥{{ asset['在庫'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>不動産</td>
+                        <td>¥{{ asset['不動産'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>設備</td>
+                        <td>¥{{ asset['設備'] }}</td>
+                    </tr>
+                    <tr class="table-info">
+                        <td>総資産</td>
+                        <td>¥{{ total_assets }}</td>
+                    </tr>
+                    <tr>
+                        <td>短期借入金</td>
+                        <td>¥{{ liability['短期借入金'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>買掛金</td>
+                        <td>¥{{ liability['買掛金'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>長期借入金</td>
+                        <td>¥{{ liability['長期借入金'] }}</td>
+                    </tr>
+                    <tr class="table-danger">
+                        <td>総負債</td>
+                        <td>¥{{ total_liabilities }}</td>
+                    </tr>
+                    <tr>
+                        <td>資本</td>
+                        <td>¥{{ equity }}</td>
+                    </tr>
+                    <tr class="table-success">
+                        <td>負債・資本の合計</td>
+                        <td>¥{{ total_liabilities_and_equity }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
