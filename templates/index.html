@@ -101,6 +101,18 @@
             color: #495057; /* ダークグレー */
         }
 
+        /* 追加編集 */
+        .top-bar {
+            background-color: #444444;
+            color: #ced4da;
+            font-weight: bold;
+        }
+
+        #ver {
+            text-align: right;
+            /* padding: 0.1em; */
+        }
+
         /* レスポンシブデザイン */
         @media (max-width: 768px) {
             .container {
@@ -110,9 +122,14 @@
     </style>
 </head>
 <body>
+    <div class="container m5-5 top-bar">
+        <h1>code_sor</h1>
+        <p>BSとPLを自動で作成して出力</p>
+        <p id="ver">ver 0.1</p>
+    </div>
     <div class="container mt-5">
-        <h2>財務諸表の各項目を入力してください。（損益計算書と貸借対照表のみ）</h2>
-        <form method="POST">
+        <!-- <h2>財務諸表の各項目を入力してください。（損益計算書と貸借対照表のみ）</h2> -->
+        <form method="POST" action="/">
             <h4>損益計算書</h4>
             <h5>収益</h5>
             <div class="row mb-3">
@@ -208,6 +225,8 @@
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">計算する</button>
+            <button type="submit" name="action" value="csv" class="btn btn-secondary">CSV出力</button>
+            <button type="submit" name="action" value="pdf" class="btn btn-secondary">PDF出力</button>
         </form>
 
         {% if profit_or_loss is not none %}
@@ -234,22 +253,27 @@
                     <tr>
                         <td>現金</td>
                         <td>¥{{ asset['現金'] }}</td>
+                        <!-- <td>¥{{ asset.get('現金', 0) }}</td> -->
                     </tr>
                     <tr>
                         <td>売掛金</td>
                         <td>¥{{ asset['売掛金'] }}</td>
+                        <!-- <td>¥{{ asset.get('売掛金', 0) }}</td> -->
                     </tr>
                     <tr>
                         <td>在庫</td>
                         <td>¥{{ asset['在庫'] }}</td>
+                        <!-- <td>¥{{ asset.get('在庫', 0) }}</td> -->
                     </tr>
                     <tr>
                         <td>不動産</td>
                         <td>¥{{ asset['不動産'] }}</td>
+                        <!-- <td>¥{{ asset.get('不動産', 0) }}</td> -->
                     </tr>
                     <tr>
                         <td>設備</td>
                         <td>¥{{ asset['設備'] }}</td>
+                        <!-- <td>¥{{ asset.get('設備', 0) }}</td> -->
                     </tr>
                     <tr class="table-info">
                         <td>総資産</td>
