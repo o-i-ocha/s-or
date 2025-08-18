@@ -25,9 +25,9 @@
             color: #444444; /* 少し暗めのグレー */
         }
 
-        h3 {
-            border-bottom: 2px solid #a1c4fd; /* 優しいブルー */
-            padding-bottom: 5px;
+        h3, h4 {
+            border-bottom: 2px solid #666666; /* 優しいブルー */
+            padding-bottom: 0.5em;
         }
 
         /* フォームのラベルと入力フィールド */
@@ -128,7 +128,6 @@
         <p id="ver">ver 0.1</p>
     </div>
     <div class="container mt-5">
-        <!-- <h2>財務諸表の各項目を入力してください。（損益計算書と貸借対照表のみ）</h2> -->
         <form method="POST" action="/">
             <h4>損益計算書</h4>
             <h5>収益</h5>
@@ -232,14 +231,48 @@
         {% if profit_or_loss is not none %}
         <div class="result-box">
             <h3>損益計算書</h3>
-            <p>売上高: ¥{{ sales }}</p>
-            <p>その他収益: ¥{{ other_revenue }}</p>
-            <p>売上原価: ¥{{ cost_of_sales }}</p>
-            <p>販売費: ¥{{ selling_expenses }}</p>
-            <p>一般管理費: ¥{{ admin_expenses }}</p>
-            <p>支払利息: ¥{{ interest_expense }}</p>
-            <p>税金: ¥{{ tax_expense }}</p>
-            <p><strong>損益: ¥{{ profit_or_loss }}</strong></p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="table-title">項目</th>
+                        <th class="table-title">金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>売上高</td>
+                        <td>¥{{ sales }}</td>
+                    </tr>
+                    <tr>
+                        <td>その他収益</td>
+                        <td>¥{{ other_revenue }}</td>
+                    </tr>
+                    <tr>
+                        <td>売上原価</td>
+                        <td>¥{{ cost_of_sales }}</td>
+                    </tr>
+                    <tr>
+                        <td>販売費</td>
+                        <td>¥{{ selling_expenses }}</td>
+                    </tr>
+                    <tr>
+                        <td>一般管理費</td>
+                        <td>¥{{ admin_expenses }}</td>
+                    </tr>
+                    <tr>
+                        <td>支払利息</td>
+                        <td>¥{{ interest_expense }}</td>
+                    </tr>
+                    <tr>
+                        <td>税金</td>
+                        <td>¥{{ tax_expense }}</td>
+                    </tr>
+                    <tr class="table-info">
+                        <td>損益</td>
+                        <td>¥{{ profit_or_loss }}</td>
+                    </tr>
+                </tbody>
+            </table>
 
             <h3 class="mt-5">貸借対照表</h3>
             <table class="table">
@@ -253,27 +286,22 @@
                     <tr>
                         <td>現金</td>
                         <td>¥{{ asset['現金'] }}</td>
-                        <!-- <td>¥{{ asset.get('現金', 0) }}</td> -->
                     </tr>
                     <tr>
                         <td>売掛金</td>
                         <td>¥{{ asset['売掛金'] }}</td>
-                        <!-- <td>¥{{ asset.get('売掛金', 0) }}</td> -->
                     </tr>
                     <tr>
                         <td>在庫</td>
                         <td>¥{{ asset['在庫'] }}</td>
-                        <!-- <td>¥{{ asset.get('在庫', 0) }}</td> -->
                     </tr>
                     <tr>
                         <td>不動産</td>
                         <td>¥{{ asset['不動産'] }}</td>
-                        <!-- <td>¥{{ asset.get('不動産', 0) }}</td> -->
                     </tr>
                     <tr>
                         <td>設備</td>
                         <td>¥{{ asset['設備'] }}</td>
-                        <!-- <td>¥{{ asset.get('設備', 0) }}</td> -->
                     </tr>
                     <tr class="table-info">
                         <td>総資産</td>
