@@ -3,6 +3,11 @@ import io
 from flask import Flask, render_template, request, send_file
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+# フォントの登録
+pdfmetrics.registerFont(TTFont('NotoSansJP', 'fonts/NotoSansJP-Regular.ttf'))
 
 app = Flask(__name__)
 
@@ -61,15 +66,17 @@ def index():
             total_liabilities = sum(liability.values())  # 総負債
             total_liabilities_and_equity = total_liabilities + equity  # 負債・資本の合計
 
+            print(f"------------asset: {asset}")
+
             # actionをチェック
             # CSVまたはPDFの出力ボタンが押された場合
             action = request.form.get('action')
             if action == 'csv':
-                print("csv")
-                return download_csv()
+                print("-------------csv-------------")
+                return generate_csv(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity)
             elif action == 'pdf':
-                print("pdf")
-                return download_pdf()
+                print("-------------pdf-------------")
+                return generate_pdf(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity)
 
             return render_template(
                 'index.html',
@@ -96,42 +103,55 @@ def index():
     # GETリクエスト時には空のフォームを表示
     return render_template('index.html', profit_or_loss=profit_or_loss)  # 初期値として profit_or_loss を渡す
 
-@app.route('/download_csv', methods=['POST'])
-def download_csv():
-    if request.method == 'POST':
-        # フォームデータの取得
-        sales = float(request.form.get('sales', 0.0))
-        other_revenue = float(request.form.get('other_revenue', 0.0))
-        cost_of_sales = float(request.form.get('cost_of_sales', 0.0))
-        selling_expenses = float(request.form.get('selling_expenses', 0.0))
-        admin_expenses = float(request.form.get('admin_expenses', 0.0))
-        interest_expense = float(request.form.get('interest_expense', 0.0))
-        tax_expense = float(request.form.get('tax_expense', 0.0))
+# csv export
+def generate_csv(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity):
+    # Step 1: 文字列IOに書き込む（文字列としてCSV作成）
+    output = io.StringIO()
+    writer = csv.writer(output)
 
-        asset = {
-            '現金': float(request.form.get('cash', 0.0)),
-            '売掛金': float(request.form.get('accounts_receivable', 0.0)),
-            '在庫': float(request.form.get('inventory', 0.0)),
-            '不動産': float(request.form.get('property', 0.0)),
-            '設備': float(request.form.get('equipment', 0.0)),
-        }
+    # 損益計算書
+    writer.writerow(["損益計算書"])
+    writer.writerow(["売上高", sales])
+    writer.writerow(["その他収益", other_revenue])
+    writer.writerow(["売上原価", cost_of_sales])
+    writer.writerow(["販売費", selling_expenses])
+    writer.writerow(["一般管理費", admin_expenses])
+    writer.writerow(["支払利息", interest_expense])
+    writer.writerow(["税金", tax_expense])
+    writer.writerow(["損益", sales + other_revenue - (cost_of_sales + selling_expenses + admin_expenses + interest_expense + tax_expense)])
 
-        liability = {
-            '短期借入金': float(request.form.get('short_term_loan', 0.0)),
-            '買掛金': float(request.form.get('accounts_payable', 0.0)),
-            '長期借入金': float(request.form.get('long_term_loan', 0.0)),
-        }
+    # 貸借対照表
+    writer.writerow(["貸借対照表"])
+    writer.writerow(["現金", asset['現金']])
+    writer.writerow(["売掛金", asset['売掛金']])
+    writer.writerow(["在庫", asset['在庫']])
+    writer.writerow(["不動産", asset['不動産']])
+    writer.writerow(["設備", asset['設備']])
+    writer.writerow(["総資産", sum(asset.values())])
 
-        equity = float(request.form.get('equity', 0.0))
+    writer.writerow(["短期借入金", liability['短期借入金']])
+    writer.writerow(["買掛金", liability['買掛金']])
+    writer.writerow(["長期借入金", liability['長期借入金']])
+    writer.writerow(["総負債", sum(liability.values())])
 
-        # CSVダウンロード処理を呼び出し
-        return download_csv(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity)
+    writer.writerow(["資本", equity])
+    writer.writerow(["負債・資本の合計", sum(liability.values()) + equity])
 
-@app.route('/download_pdf', methods=['POST'])
+    # Step 2: 文字列をバイトにエンコードして BytesIO に変換
+    csv_data = output.getvalue()
+    bom_utf8 = '\ufeff' + csv_data 
+    byte_io = io.BytesIO()
+    byte_io.write(bom_utf8.encode('utf-8'))
+    byte_io.seek(0)
+
+    return send_file(byte_io, as_attachment=True, download_name="financial_statement.csv", mimetype="text/csv")
+
 # PDF出力処理
-def download_pdf(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity):
+def generate_pdf(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity):
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
+    c.setFont("NotoSansJP", 12)
+
     c.drawString(100, 750, f"損益計算書")
     c.drawString(100, 730, f"売上高: ¥{sales}")
     c.drawString(100, 710, f"その他収益: ¥{other_revenue}")
