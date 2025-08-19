@@ -1,5 +1,6 @@
 import csv
 import io
+from datetime import datetime
 from flask import Flask, render_template, request, send_file
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -66,16 +67,12 @@ def index():
             total_liabilities = sum(liability.values())  # 総負債
             total_liabilities_and_equity = total_liabilities + equity  # 負債・資本の合計
 
-            print(f"------------asset: {asset}")
-
             # actionをチェック
             # CSVまたはPDFの出力ボタンが押された場合
             action = request.form.get('action')
             if action == 'csv':
-                print("-------------csv-------------")
                 return generate_csv(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity)
             elif action == 'pdf':
-                print("-------------pdf-------------")
                 return generate_pdf(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity)
 
             return render_template(
@@ -103,48 +100,60 @@ def index():
     # GETリクエスト時には空のフォームを表示
     return render_template('index.html', profit_or_loss=profit_or_loss)  # 初期値として profit_or_loss を渡す
 
+# 会計帳簿を直接編集するページ
+@app.route('/accounting')
+def accounting():
+    return render_template('accounting.html')
+
+# 管理ページ
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
 # csv export
 def generate_csv(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity):
-    # Step 1: 文字列IOに書き込む（文字列としてCSV作成）
     output = io.StringIO()
     writer = csv.writer(output)
 
     # 損益計算書
     writer.writerow(["損益計算書"])
-    writer.writerow(["売上高", sales])
-    writer.writerow(["その他収益", other_revenue])
-    writer.writerow(["売上原価", cost_of_sales])
-    writer.writerow(["販売費", selling_expenses])
-    writer.writerow(["一般管理費", admin_expenses])
-    writer.writerow(["支払利息", interest_expense])
-    writer.writerow(["税金", tax_expense])
-    writer.writerow(["損益", sales + other_revenue - (cost_of_sales + selling_expenses + admin_expenses + interest_expense + tax_expense)])
+    writer.writerow(["売上高", int(sales)])
+    writer.writerow(["その他収益", int(other_revenue)])
+    writer.writerow(["売上原価", int(cost_of_sales)])
+    writer.writerow(["販売費", int(selling_expenses)])
+    writer.writerow(["一般管理費", int(admin_expenses)])
+    writer.writerow(["支払利息", int(interest_expense)])
+    writer.writerow(["税金", int(tax_expense)])
+    writer.writerow(["損益", int(sales + other_revenue - (cost_of_sales + selling_expenses + admin_expenses + interest_expense + tax_expense))])
 
     # 貸借対照表
     writer.writerow(["貸借対照表"])
-    writer.writerow(["現金", asset['現金']])
-    writer.writerow(["売掛金", asset['売掛金']])
-    writer.writerow(["在庫", asset['在庫']])
-    writer.writerow(["不動産", asset['不動産']])
-    writer.writerow(["設備", asset['設備']])
-    writer.writerow(["総資産", sum(asset.values())])
+    writer.writerow(["現金", int(asset['現金'])])
+    writer.writerow(["売掛金", int(asset['売掛金'])])
+    writer.writerow(["在庫", int(asset['在庫'])])
+    writer.writerow(["不動産", int(asset['不動産'])])
+    writer.writerow(["設備", int(asset['設備'])])
+    writer.writerow(["総資産", int(sum(asset.values()))])
 
-    writer.writerow(["短期借入金", liability['短期借入金']])
-    writer.writerow(["買掛金", liability['買掛金']])
-    writer.writerow(["長期借入金", liability['長期借入金']])
-    writer.writerow(["総負債", sum(liability.values())])
+    writer.writerow(["短期借入金", int(liability['短期借入金'])])
+    writer.writerow(["買掛金", int(liability['買掛金'])])
+    writer.writerow(["長期借入金", int(liability['長期借入金'])])
+    writer.writerow(["総負債", int(sum(liability.values()))])
 
-    writer.writerow(["資本", equity])
-    writer.writerow(["負債・資本の合計", sum(liability.values()) + equity])
+    writer.writerow(["資本", int(equity)])
+    writer.writerow(["負債・資本の合計", int(sum(liability.values()) + equity)])
 
-    # Step 2: 文字列をバイトにエンコードして BytesIO に変換
+    # エンコードして送信
     csv_data = output.getvalue()
     bom_utf8 = '\ufeff' + csv_data 
     byte_io = io.BytesIO()
     byte_io.write(bom_utf8.encode('utf-8'))
     byte_io.seek(0)
 
-    return send_file(byte_io, as_attachment=True, download_name="financial_statement.csv", mimetype="text/csv")
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"accounting_data_{timestamp}.csv"
+
+    return send_file(byte_io, as_attachment=True, download_name=filename, mimetype="text/csv")
 
 # PDF出力処理
 def generate_pdf(sales, other_revenue, cost_of_sales, selling_expenses, admin_expenses, interest_expense, tax_expense, asset, liability, equity):
@@ -153,42 +162,43 @@ def generate_pdf(sales, other_revenue, cost_of_sales, selling_expenses, admin_ex
     c.setFont("NotoSansJP", 12)
 
     c.drawString(100, 750, f"損益計算書")
-    c.drawString(100, 730, f"売上高: ¥{sales}")
-    c.drawString(100, 710, f"その他収益: ¥{other_revenue}")
-    c.drawString(100, 690, f"売上原価: ¥{cost_of_sales}")
-    c.drawString(100, 670, f"販売費: ¥{selling_expenses}")
-    c.drawString(100, 650, f"一般管理費: ¥{admin_expenses}")
-    c.drawString(100, 630, f"支払利息: ¥{interest_expense}")
-    c.drawString(100, 610, f"税金: ¥{tax_expense}")
-    c.drawString(100, 590, f"損益: ¥{sales + other_revenue - (cost_of_sales + selling_expenses + admin_expenses + interest_expense + tax_expense)}")
-    
+    c.drawString(100, 730, f"売上高: ¥{int(sales)}")
+    c.drawString(100, 710, f"その他収益: ¥{int(other_revenue)}")
+    c.drawString(100, 690, f"売上原価: ¥{int(cost_of_sales)}")
+    c.drawString(100, 670, f"販売費: ¥{int(selling_expenses)}")
+    c.drawString(100, 650, f"一般管理費: ¥{int(admin_expenses)}")
+    c.drawString(100, 630, f"支払利息: ¥{int(interest_expense)}")
+    c.drawString(100, 610, f"税金: ¥{int(tax_expense)}")
+    c.drawString(100, 590, f"損益: ¥{int(sales + other_revenue - (cost_of_sales + selling_expenses + admin_expenses + interest_expense + tax_expense))}")
+
     # 空行を追加
     c.drawString(100, 570, "")
     c.drawString(100, 550, "貸借対照表")
 
-    # 資産の項目
-    c.drawString(100, 530, f"現金: ¥{asset['現金']}")
-    c.drawString(100, 510, f"売掛金: ¥{asset['売掛金']}")
-    c.drawString(100, 490, f"在庫: ¥{asset['在庫']}")
-    c.drawString(100, 470, f"不動産: ¥{asset['不動産']}")
-    c.drawString(100, 450, f"設備: ¥{asset['設備']}")
-    c.drawString(100, 430, f"総資産: ¥{sum(asset.values())}")
+    c.drawString(100, 530, f"現金: ¥{int(asset['現金'])}")
+    c.drawString(100, 510, f"売掛金: ¥{int(asset['売掛金'])}")
+    c.drawString(100, 490, f"在庫: ¥{int(asset['在庫'])}")
+    c.drawString(100, 470, f"不動産: ¥{int(asset['不動産'])}")
+    c.drawString(100, 450, f"設備: ¥{int(asset['設備'])}")
+    c.drawString(100, 430, f"総資産: ¥{int(sum(asset.values()))}")
 
-    # 負債の項目
-    c.drawString(100, 410, f"短期借入金: ¥{liability['短期借入金']}")
-    c.drawString(100, 390, f"買掛金: ¥{liability['買掛金']}")
-    c.drawString(100, 370, f"長期借入金: ¥{liability['長期借入金']}")
-    c.drawString(100, 350, f"総負債: ¥{sum(liability.values())}")
+    c.drawString(100, 410, f"短期借入金: ¥{int(liability['短期借入金'])}")
+    c.drawString(100, 390, f"買掛金: ¥{int(liability['買掛金'])}")
+    c.drawString(100, 370, f"長期借入金: ¥{int(liability['長期借入金'])}")
+    c.drawString(100, 350, f"総負債: ¥{int(sum(liability.values()))}")
 
-    # 資本の項目
-    c.drawString(100, 330, f"資本: ¥{equity}")
-    c.drawString(100, 310, f"負債・資本の合計: ¥{sum(liability.values()) + equity}")
+    c.drawString(100, 330, f"資本: ¥{int(equity)}")
+    c.drawString(100, 310, f"負債・資本の合計: ¥{int(sum(liability.values()) + equity)}")
 
     c.showPage()
     c.save()
 
     buffer.seek(0)
-    return send_file(buffer, as_attachment=True, download_name="financial_statement.pdf", mimetype="application/pdf")
+
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"accounting_data_{timestamp}.pdf"
+
+    return send_file(buffer, as_attachment=True, download_name=filename, mimetype="application/pdf")
 
 
 if __name__ == '__main__':
