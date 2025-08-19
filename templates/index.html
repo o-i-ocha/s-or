@@ -6,38 +6,66 @@
     <title>s-or</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* ベースの背景色 */
         body {
-            background-color: #fafafa; /* 明るいグレー */
-            color: #333333; /* ダークグレー */
+            background-color: #fafafa;
+            color: #333333;
             font-family: 'Arial', sans-serif;
         }
 
-        /* コンテナを中央寄せ */
         .container {
-            background-color: #ffffff; /* 白背景 */
+            background-color: #ffffff;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        h2, h3, h4, h5 {
-            color: #444444; /* 少し暗めのグレー */
-        }
-
         h3, h4 {
-            border-bottom: 2px solid #666666; /* 優しいブルー */
+            color: #444444;
+            border-bottom: 2px solid #666666;
             padding-bottom: 0.5em;
         }
 
-        /* フォームのラベルと入力フィールド */
+        nav {
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+        }
+
+        nav .nav-left {
+            font-size: 1.2rem;
+            color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 4px;
+        }
+
+        nav ul li a:hover {
+            background-color: #34495e;
+        }
+
         .form-label {
-            color: #555555; /* ダークグレー */
+            color: #555555;
             font-weight: bold;
         }
 
         .form-control {
-            background-color: #f8f9fa; /* 明るいグレー */
+            background-color: #f8f9fa;
             border: 1px solid #ced4da;
             color: #333333;
             font-weight: 500;
@@ -50,92 +78,112 @@
         }
 
         .btn-primary {
-            background-color: #6c757d; /* グレー系のボタン */
+            background-color: #6c757d;
             border-color: #6c757d;
         }
 
         .btn-primary:hover {
-            background-color: #5a6268; /* ダークグレー */
+            background-color: #5a6268;
             border-color: #545b62;
         }
 
-        /* 結果ボックス */
         .result-box {
-            background-color: #f1f1f1; /* 明るいグレー */
+            background-color: #f1f1f1;
             border-radius: 10px;
             padding: 20px;
             margin-top: 30px;
         }
 
         .table {
-            color: #333333; /* ダークグレー */
+            color: #333333;
         }
 
         .table th, .table td {
-            background-color: #f8f9fa; /* 明るいグレー */
+            background-color: #f8f9fa;
             border: 1px solid #ddd;
         }
 
         .table th {
-            background-color: #e9ecef; /* 薄いグレー */
+            background-color: #e9ecef;
         }
 
         .table-info {
-            background-color: #cce5ff; /* 明るいブルー */
+            background-color: #cce5ff;
             font-weight: bold;
         }
 
         .table-success {
-            background-color: #d4edda; /* 薄いグリーン */
+            background-color: #d4edda;
             font-weight: bold;
         }
 
         .table-danger {
-            background-color: #f8d7da; /* 薄いピンク */
+            background-color: #f8d7da;
             font-weight: bold;
         }
 
-        /* 行間やセパレータを強調 */
         .table-title {
             font-weight: bold;
-            color: #495057; /* ダークグレー */
+            color: #495057;
         }
 
-        /* 追加編集 */
-        .top-bar {
-            background-color: #444444;
-            color: #ced4da;
-            font-weight: bold;
+        .text-positive {
+            color: #007bff;
         }
 
-        #ver {
-            text-align: right;
-            /* padding: 0.1em; */
+        .text-negative {
+            color: #dc3545;
         }
 
-        /* レスポンシブデザイン */
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
             }
         }
 
-        /* プラスの場合は青、マイナスの場合は赤 */
-        .text-positive {
-            color: #007bff; /* 青色 */
-        }
+        @media (max-width: 600px) {
+            nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-        .text-negative {
-            color: #dc3545; /* 赤色 */
-        }
+            nav ul {
+                flex-direction: column;
+                width: 100%;
+            }
 
+            nav ul li a {
+                width: 100%;
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container m5-5 top-bar">
-        <h1>code_sor</h1>
+    <!-- <div class="container mt-5 top-bar">
+        <h1>soraMe</h1>
         <p>BSとPLを自動で作成して出力</p>
-        <p id="ver">ver 0.1</p>
+        <p id="ver">ver 0.2</p>
+    </div> -->
+    <div class="container mt-4">
+        <nav class="navbar navbar-expand-md px-3" style="background-color: #2c3e50; border-radius: 8px;">
+            <div class="container-fluid">
+                <a class="navbar-brand text-white fw-bold" href="#">soraMer</a>
+                <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ url_for('accounting') }}">会計</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ url_for('admin') }}">管理</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
     </div>
     <div class="container mt-5">
         <form method="POST" action="/">
@@ -346,5 +394,6 @@
         </div>
         {% endif %}
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
